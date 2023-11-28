@@ -1,0 +1,63 @@
+
+html, body { margin: 0; padding: 0; height: 100vh; }
+
+body {
+    background-color: #0a4e93;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+}
+
+/* This is the container for all.  It is designed to fill the viewport. */
+#main-container {
+    height: 100%;
+    overflow: hidden;
+}
+
+#game-view-container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background-color: #0a4e93;
+}
+
+#board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#board-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+
+}
+
+#controls-container {
+    /*border: solid black 2px;*/
+    /*border-radius: 7px;*/
+    display: flex;
+    margin-left: 10px;
+    padding-left: 10px;
+    width: 100%;
+    justify-content: space-around;
+
+}
+
+#game-canvas {
+    position: relative;
+    border: solid black 2px;
+    border-radius: 3px;
+    background-color: rgb(250, 250, 255);
+    z-index: 0;
+}
+
+button {
+    color: white;
+    background-color: forestgreen;
+    padding: 10px;
+}
+
+.reset{
+    background-color: red;
+}

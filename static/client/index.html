@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Star Battle Client</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <div id="main-container">
+            <!-- Game view -->
+            <div id="game-view-container">
+                <div id="board-container">
+                    <div id="canvas-container">
+                        <canvas id="game-canvas" width="500" height="500"></canvas>
+                    </div>
+                    <div>
+                        <label for="levels">Choose a level:</label>
+                        <select name="levels" id="levels">
+                            <option value=1>1</option>
+                            <option value=2>2</option>
+                            <option value=3>3</option>
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <div id="controls-container">
+                    <div>
+                        <button id="hint">Hint</button>
+                        <label for="hint">Limit: 3</label>
+                    </div>
+
+                    <button class="reset">Reset</button>
+                </div>
+            </div><!-- game-view-container -->
+        </div><!-- main-container -->
+
+        <!-- Load our JS as a ES6 module -->
+        <script type="module" src="js/main.js"></script>
+    </body>
+</html>
