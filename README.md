@@ -1,5 +1,7 @@
 # Star Battle
 
+This is a group project copied from the main repository!
+
 Project includes both client and server code.
 
 ## Client
