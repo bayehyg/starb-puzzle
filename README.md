@@ -4,6 +4,8 @@ This is a group project copied from the main repository!
 
 Project includes both client and server code.
 
+[How to play](https://www.braingle.com/games/starbattle/instructions.php)
+
 ## Client
 
 ### Java Client
