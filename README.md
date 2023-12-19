@@ -4,7 +4,8 @@ This is a group project copied from the main repository!
 
 Project includes both client and server code.
 
-[How to play](https://www.braingle.com/games/starbattle/instructions.php)
+
+<a style="color: green;" href="https://www.braingle.com/games/starbattle/instructions.php" target="_blank">How to play</a>
 
 ## Client
 
