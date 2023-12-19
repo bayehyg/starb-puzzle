@@ -1,15 +1,17 @@
 package starb.server.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import starb.client.Client;
 import starb.server.Puzzle;
+import starb.server.repo.ClientRepository;
 import starb.server.repo.PuzzleRepository;
-import starb.server.repo.PuzzleService;
+
+import java.util.ArrayList;
 import java.util.Optional;
 
 import java.util.List;
@@ -18,36 +20,65 @@ import java.util.List;
 @RequestMapping(path="starb")
 public class PuzzleController {
 
-    //private PuzzleService ps;
     @Autowired
-    private PuzzleRepository repo;
+    private PuzzleRepository puzRepo;
+    @Autowired
+    private ClientRepository cliRepo;
 
-    @GetMapping("/")
-    public Puzzle levelOne() {
-        Optional<Puzzle> rtr = Optional.of(repo.findPuzzleByLevel(1));
-        if(rtr.isPresent()) {
-            return rtr.get();
+
+    @PutMapping("/client/{puzzId}")
+    public ResponseEntity<Client> addToSolved(@PathVariable String puzzId, HttpServletRequest request){
+
+        try{
+            Optional<Puzzle> opt = puzRepo.findById(puzzId);
+            if(opt.isPresent()){
+                Client cli = cliRepo.ip(request.getRemoteAddr());
+                cli.addSolved(opt.get().getId());
+                cliRepo.save(cli);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(cli);
+            }else{
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/client")
+    public ResponseEntity<Client> findOrCreate(HttpServletRequest request){
+        try {
+            Optional<Client> optionalClient = Optional.ofNullable(cliRepo.ip(request.getRemoteAddr()));
+
+            if (optionalClient.isPresent()) {
+                Client cli = optionalClient.get();
+                cliRepo.save(cli);
+                return ResponseEntity.status(HttpStatus.OK).body(cli);
+            } else {
+                List<String> solved = new ArrayList<>();
+                Client newClient = new Client(request.getRemoteAddr(), solved);
+                cliRepo.save(newClient);
+                return ResponseEntity.status(HttpStatus.CREATED).body(newClient);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/all")
     public List<Puzzle> findAllPuzzles(){
-        Optional<List<Puzzle>> rtr = Optional.of(repo.findAll());
+        Optional<List<Puzzle>> rtr = Optional.of(puzRepo.findAll());
         if(rtr.isPresent()) {
             return rtr.get();
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
-//
-//    @GetMapping
-//    public Puzzle findPuzzleByLevel(int level){
-//        return ps.getPuzzleBYLevel(level);
-//    }
 
     @GetMapping("{level}")
     public Puzzle getOnePuzzleByLevel( @PathVariable("level") int level ) {
-        Optional<Puzzle> rtr = Optional.of(repo.findPuzzleByLevel(level));
+        Optional<Puzzle> rtr = Optional.of(puzRepo.findPuzzleByLevel(level));
         if(rtr.isPresent()) {
             return rtr.get();
         }

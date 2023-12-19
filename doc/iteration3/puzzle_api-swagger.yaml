@@ -1,0 +1,67 @@
+openapi: 3.0.3
+info:
+  title: Star Battle
+  description: Operations available on the star battle api
+  version: 1.0.0
+servers:
+  - url: http://localhost:3390/starb
+paths:
+  /puzzle/{level}:
+    get:
+      tags:
+        - puzzle
+      summary: Get a puzzle by level
+      parameters:
+        - name: level
+          in: path
+          description: Level of the puzzle
+          content:
+            application/json:
+              example:
+                - _id:
+                    $oid: "6548b5849ccc4c6176ea8cff"
+                  level: 1
+                  regions:
+                    - - row: 0
+                        col: 0
+                  gridSize: 10
+                  numStars: 2
+                  _class: "starb.server.Puzzle"
+                - _id:
+                    $oid: "6548b5849ccc4c6176ea8d00"
+                  level: 2
+                  regions:
+                    - - row: 0
+                        col: 0
+                  gridSize: 8
+                  numStars: 3 ...
+                  class: "starb.server.Puzzle"
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response with the puzzle details.
+
+        '404':
+          description: The specified level is not found.
+
+  /starb/:
+    get:
+      tags:
+        - puzzle
+      summary: Get a list of puzzles
+      parameters:
+        - name:
+          in: path
+          description: list of puzzles
+          required: true
+          schema:
+            type: List<Puzzle>
+      responses:
+        '200':
+          description: Successful response with puzzle list
+          content:
+            application/json:
+        '404':
+          description: The path is not found.

@@ -2,6 +2,7 @@ package starb.server;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import javafx.scene.Scene;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -70,6 +71,11 @@ public class Puzzle {
             if(cells.contains(c)) return cells;
         }
         return null;
+    }
+
+    public boolean available(Cell c){
+        int index = regions.indexOf(getRegion(c));
+        return starsPerRegion[index] < 2;
     }
 
     public boolean updateStarredRegion(Cell c, int i){

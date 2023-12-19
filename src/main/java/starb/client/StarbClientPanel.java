@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.control.Label;
@@ -30,8 +31,10 @@ public class StarbClientPanel extends VBox {
     public static Button b2;
 
     public StarbClientDrawing drawing;
+    public Client user;
+    private int numSolved;
 
-    public StarbClientPanel(StarbClientDrawing drawing){
+    public StarbClientPanel(StarbClientDrawing drawing) {
         this.drawing = drawing;
         this.setBorder(new Border(
                 new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID,
@@ -39,29 +42,45 @@ public class StarbClientPanel extends VBox {
                         new javafx.geometry.Insets(10,10,10,10)) )
         );
         this.setPadding(new Insets(10,10,10,10));
-
+        try {
+            String url = "http://127.0.0.1:3390/starb/client";
+            HttpClient httpClient = HttpClient.newHttpClient();
+            HttpRequest req = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+            HttpResponse<String> response = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+            ObjectMapper mapper = new ObjectMapper();
+            this.user  = mapper.readValue(response.body(), Client.class);
+            this.numSolved = user.getSolved().size();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
         setSpacing(20);
         Button b1 = new Button("Hints");
         AtomicInteger value = new AtomicInteger(3);
-        b1.setOnMouseClicked(event -> {
-            value.set(value.intValue() - 1);
-        });
         Label hint = new Label("Hints Remaining: " + value);
+        Tooltip invalidHintTooltip = new Tooltip("No more hints available!");
+        b1.setOnMouseClicked(event -> {
+            if(value.intValue() <= 0){
+                Tooltip.install(b1, invalidHintTooltip);
+                invalidHintTooltip.show(b1.getScene().getWindow(), event.getScreenX(), event.getScreenY() + 10);
+            }else {
+                drawing.hint();
+                value.set(value.intValue() - 1);
+                hint.setText("Hints Remaining: " + value);
+            }
+        });
         hint.setFont(Font.font("Serif", FontWeight.BOLD, 14));
         b2 = new Button("Reset");
         b2.setStyle("-fx-background-color: #ef7070");
-        Label comboLabel = new Label("Level");
+        Label comboLabel = new Label("Level: " + levelString());
         comboLabel.setFont(Font.font("Serif", FontWeight.BOLD, 14));
         ComboBox<String> b3 = new ComboBox<>();
         comboLabel.setLabelFor(b3);
-        List<String> values = new ArrayList<>();
-        for(int i = 1; i < 25; ++i){
-            values.add(String.valueOf(i));
-        }
+        b3.getItems().add("1");
         b3.setValue("1");
-        b3.getItems().addAll(values);
-        b3.setOnAction(e -> {
 
+        b3.setOnAction(e -> {
             try {
                 String val = b3.getValue();
                 String url = "http://127.0.0.1:3390/starb/" + val;
@@ -76,10 +95,15 @@ public class StarbClientPanel extends VBox {
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
-
         });
+
         AtomicInteger lev = new AtomicInteger(0);
         Label level = new Label("Level's Completed: " + lev);
+        drawing.b1.setOnMouseClicked(e -> {
+            b3.getItems().add(String.valueOf(drawing.puzzle.getLevel()));
+            lev.set(lev.intValue() + 1);
+            level.setText("Level's Completed: " + lev);
+        });
         level.setFont(Font.font("Serif", FontWeight.BOLD, 14));
         b2.setOnAction(e -> {
             System.out.println("RESET");
@@ -101,6 +125,16 @@ public class StarbClientPanel extends VBox {
         stage.setScene(sc);
         stage.setTitle("Level Selection");
         stage.show();
+    }
+
+    private String levelString(){
+
+        int n = this.numSolved;
+        if(n > 19) return "Guru";
+        if(n > 15) return "Expert";
+        if(n > 10) return "Intermediate";
+        if(n > 4) return "Beginner";
+        return "Novice";
     }
 
 }

@@ -1,0 +1,155 @@
+openapi: 3.0.3
+info:
+  title: Star Battle
+  description: Operations available on the star battle api
+  version: 1.1.0
+servers:
+  - url: http://localhost:3390/starb
+paths:
+  /client:
+    get:
+      tags:
+        - client
+      summary: Gets a Client Id, creates new id if the user is new
+
+      responses:
+        '200':
+          description: Successful response of existing ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "656aceae40d2b37068e597ee"
+                  ip:
+                    type: string
+                    example: "127.0.0.1"
+                  solved:
+                    type: array
+                    items:
+                      type: string
+                    example: [ ]
+        '201':
+          description: Succesfully created new ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "656aceae40d2b37068e597ee"
+                  ip:
+                    type: string
+                    example: "127.0.0.1"
+                  solved:
+                    type: array
+                    items:
+                      type: string
+                    example: [ ]
+
+        '500':
+          description: Internal server error
+
+
+  /client/{puzzId}:
+    put:
+      tags:
+        - client
+      summary: Add new puzzle level as solved
+      parameters:
+        - name: puzzID
+          in: path
+          description: ID of the puzzle to be added
+          required: true
+          schema:
+            type: string
+            example: "6548b5849ccc4c6176ea8d00"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "656aceae40d2b37068e597ee"
+                  ip:
+                    type: string
+                    example: "127.0.0.1"
+                  solved:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - "6548b5849ccc4c6176ea8d00"
+        '404':
+          description: The puzzle doesn't exist.
+        '500':
+          description: Internal server error
+
+  /puzzle/{level}:
+    get:
+      tags:
+        - puzzle
+      summary: Get a puzzle by level
+      parameters:
+        - name: level
+          in: path
+          description: Level of the puzzle
+          content:
+            application/json:
+              example:
+                - _id:
+                    $oid: "6548b5849ccc4c6176ea8cff"
+                  level: 1
+                  regions:
+                    - - row: 0
+                        col: 0
+                  gridSize: 10
+                  numStars: 2
+                  _class: "starb.server.Puzzle"
+                - _id:
+                    $oid: "6548b5849ccc4c6176ea8d00"
+                  level: 2
+                  regions:
+                    - - row: 0
+                        col: 0
+                  gridSize: 8
+                  numStars: 3 ...
+                  class: "starb.server.Puzzle"
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response with the puzzle details.
+
+        '404':
+          description: The specified level is not found.
+
+  /starb/all:
+    get:
+      tags:
+        - puzzle
+      summary: Get a list of puzzles
+      parameters:
+        - name:
+          in: path
+          description: list of puzzles
+          required: true
+          schema:
+            type: List<Puzzle>
+      responses:
+        '200':
+          description: Successful response with puzzle list
+          content:
+            application/json:
+        '404':
+          description: The path is not found.
+
+
